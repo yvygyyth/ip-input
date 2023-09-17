@@ -9,6 +9,7 @@
   autofocus
   ref="myInput"
   placeholder="Lazy usage" 
+  :style="customStyle"
   />
   <a-alert v-show="showParagraph==1" message="Info Text" type="info" />
   <a-alert v-show="showParagraph==2" message="Success Text" type="success" />
@@ -23,6 +24,28 @@ const myInput = ref(null)
 
 let params = /^((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$/
 let param = /^(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$/
+
+
+const props = defineProps({
+  letterSpacing: {
+    type: String,
+    default: '60px' // 设置默认字间距
+  },
+  widthInput: {
+    type: String,
+    default: '800px' // 设置默认输入框宽度
+  },
+  coefficient:{
+    type: Number,
+    default: 20//设置字间距变化系数
+  }
+});
+
+const customStyle = ref({
+  letterSpacing: props.letterSpacing,
+  width:props.widthInput
+});
+
 // import {AInput} from 'ant-design-vue'
 // 获取.的位置
 const getPlace = (str) =>{
@@ -94,7 +117,8 @@ watch(value, (newValue, oldValue) => {
     showTab(3)
   }
   // 字间距
-  elementInput.style.letterSpacing = 500/(newValue.length+6)+'px'
+  customStyle.value.letterSpacing = parseInt(props.widthInput)/(newValue.length+props.coefficient)+'px'
+  console.log(customStyle.value.letterSpacing)
 
   if(arrNew[i]  ==  ''){
 
@@ -206,8 +230,6 @@ const onkeydown = function(event){
 
 <style lang="less" scoped>
 .ipInput{
-  width: 500px;
-  letter-spacing:80px;
   text-align: center;
 }
 </style>
