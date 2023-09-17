@@ -24,7 +24,7 @@ const myInput = ref(null)
 
 let params = /^((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$/
 let param = /^(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$/
-
+let keyDownNum = null
 
 const props = defineProps({
   letterSpacing: {
@@ -102,6 +102,7 @@ watch(value, (newValue, oldValue) => {
   const elementInput = document.getElementById('ipInput')
   // 位置
   let locationS = elementInput.selectionStart
+  let locationE = elementInput.selectionEnd
   // console.log(myInput.value)
   // console.log(`新值：${newValue}, 旧值：${oldValue}, 光标位置：${locationS.selectionStart},二${myInput.value.selectionStart}`);
   let arrNew = newValue.split('.')
@@ -127,8 +128,27 @@ watch(value, (newValue, oldValue) => {
     value.value = oldValue
     // console.log('保留旧值')
     setTimeout(() => {
-    // 在异步回调中获取最新的值
       elementInput.setSelectionRange(locationS, locationS)
+      // 在异步回调中获取最新的值
+      if(keyDownNum != null && /^\d$/.test(keyDownNum)){
+        const textToInsert = keyDownNum;
+
+        // 将文本插入到光标位置
+        const newValue =
+          oldValue.substring(0, locationS) +
+          textToInsert +
+          oldValue.substring(locationE);
+
+        // 更新输入框的值
+        value.value = newValue;
+        setTimeout(()=>{
+            elementInput.setSelectionRange(
+            locationS + textToInsert.length,
+            locationS + textToInsert.length
+          );
+        },0)
+        // 更新光标的位置，将光标移动到插入文本的末尾
+      }
     }, 0);
   }
   else if(newValue.match(params)){
@@ -166,7 +186,7 @@ const onkeydown = function(event){
   let str = value.value
   let start = event.target.selectionStart
   let end = event.target.selectionEnd
-
+  keyDownNum = event.key
   
   if(event.key === 'Enter'){ 
     // 获取光标位置
@@ -186,8 +206,18 @@ const onkeydown = function(event){
   else if(event.key === 'Backspace'||event.key === 'Delete'){
     let num = str.match(/\./g)
     let cha = 3 - num.length
+    let xuanZhong = str.substring(start, end)
 
-    if(str[end-1]=='.'){
+    if(xuanZhong.includes('.')){
+      event.preventDefault()
+      str = str.replace(xuanZhong,xuanZhong.replace(/\d+/g, ''))
+      value.value = str
+      setTimeout(() => {
+      //在异步回调中获取最新的值
+        myInput.value.setSelectionRange(start, start)
+      }, 0);
+    }
+    else if(str[end-1]=='.'){
       setTimeout(() => {
       //在异步回调中获取最新的值
         myInput.value.setSelectionRange(start-1, start-1)
