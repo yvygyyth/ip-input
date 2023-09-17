@@ -186,19 +186,8 @@ const onkeydown = function(event){
   else if(event.key === 'Backspace'||event.key === 'Delete'){
     let num = str.match(/\./g)
     let cha = 3 - num.length
-    let xuanZhong = str.substring(start, end)
 
-
-    if(xuanZhong.includes('.')){
-      event.preventDefault()
-      str = str.replace(xuanZhong,xuanZhong.replace(/\d+/g, ''))
-      value.value = str
-      setTimeout(() => {
-      //在异步回调中获取最新的值
-        myInput.value.setSelectionRange(start, start)
-      }, 0);
-    }
-    else if(str[end-1]=='.'){
+    if(str[end-1]=='.'){
       setTimeout(() => {
       //在异步回调中获取最新的值
         myInput.value.setSelectionRange(start-1, start-1)
@@ -215,6 +204,18 @@ const onkeydown = function(event){
   }
   else if(event.key === '.'){
     event.preventDefault()
+  }
+  else{
+    let xuanZhong = str.substring(start, end)
+    if(xuanZhong.includes('.')){
+      event.preventDefault()
+      str = str.replace(xuanZhong,xuanZhong.replace(/\d+/g, ''))
+      value.value = str
+      setTimeout(() => {
+      //在异步回调中获取最新的值
+        myInput.value.setSelectionRange(start, start)
+      }, 0);
+    }
   }
 }; 
 
